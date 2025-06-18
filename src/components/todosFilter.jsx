@@ -1,6 +1,13 @@
 import { Box, Tabs, Text } from '@radix-ui/themes'
+import { useTodos } from '../store/todosStore'
+import TodoFilterList from './todoFilterList'
 
 const TodosFilter = () => {
+  const todos = useTodos((state) => state.todos)
+  const pendingTodos = todos.filter((todo) => todo.status === 'PENDING')
+  const doneTodos = todos.filter((todo) => todo.status === 'DONE')
+  const deniedTodos = todos.filter((todo) => todo.status === 'DENIED')
+
   return (
     <div className='todo-filter border border-gray-400 rounded-md p-10'>
       <Tabs.Root defaultValue='pending' className='tab'>
@@ -12,17 +19,15 @@ const TodosFilter = () => {
 
         <Box pt='3'>
           <Tabs.Content value='pending'>
-            <Text size='2'>Make changes to your account.</Text>
+            <TodoFilterList todos={pendingTodos} />
           </Tabs.Content>
 
           <Tabs.Content value='done'>
-            <Text size='2'>Access and update your documents.</Text>
+            <TodoFilterList todos={doneTodos} />
           </Tabs.Content>
 
           <Tabs.Content value='denied'>
-            <Text size='2'>
-              Edit your profile or update contact information.
-            </Text>
+            <TodoFilterList todos={deniedTodos} />
           </Tabs.Content>
         </Box>
       </Tabs.Root>

@@ -1,21 +1,25 @@
 import { Badge, Button, Flex, Heading } from '@radix-ui/themes'
 import React from 'react'
+import { useTodos } from '../store/todosStore'
 
 const TodosList = () => {
-  const todos = [
-    {
-      id: 1,
-      title: 'Code something',
-      description: 'Tomorrow i have to code alot of things inshallah',
-      status: 'PENDING',
-    },
-    {
-      id: 2,
-      title: 'Another todo',
-      description: 'Tomorrow i have to code alot of things inshallah',
-      status: 'DONE',
-    },
-  ]
+  // const todos = [
+  //   {
+  //     id: 1,
+  //     title: 'Code something',
+  //     description: 'Tomorrow i have to code alot of things inshallah',
+  //     status: 'PENDING',
+  //   },
+  //   {
+  //     id: 2,
+  //     title: 'Another todo',
+  //     description: 'Tomorrow i have to code alot of things inshallah',
+  //     status: 'DONE',
+  //   },
+  // ]
+
+  const todos = useTodos((state) => state.todos)
+  const removeTodo = useTodos((state) => state.removeTodo)
   return (
     <ul className='!mt-5 !space-y-3'>
       {todos.length ? (
@@ -44,7 +48,9 @@ const TodosList = () => {
               </div>
               <div className='!space-x-3'>
                 <Button>Edit</Button>
-                <Button color='red'>Delete</Button>
+                <Button color='red' onClick={() => removeTodo(todo.id)}>
+                  Delete
+                </Button>
               </div>
             </div>
           </li>
