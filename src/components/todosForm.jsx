@@ -7,65 +7,65 @@ import {
   TextField,
 } from '@radix-ui/themes'
 import { useTodos } from '../store/todosStore'
-import { useFormik } from 'formik'
+import { useState } from 'react'
 
 const TodosForm = () => {
   const addTodo = useTodos((state) => state.addTodo)
   const todos = useTodos((state) => state.todos)
-  const status = ['PENDING', 'DONE', 'DENIED']
+  const statusValues = ['PENDING', 'DONE', 'DENIED']
+
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [status, setStatus] = useState(statusValues[0])
 
   console.log(todos)
 
-  const formik = useFormik({
-    initialValues: {
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (!title) return
+    const newTodo = {
       id: Date.now(),
-      title: '',
-      description: '',
-      status: status[0],
-    },
+      title,
+      description,
+      status,
+    }
 
-    onSubmit: (values) => {
-      addTodo({ ...values, id: Date.now() })
-      clearValues()
-    },
-  })
+    addTodo(newTodo)
+    clearValues()
+  }
 
   const clearValues = () => {
-    formik.resetForm({
-      values: {
-        title: '',
-        description: '',
-        status: status[0],
-      },
-    })
+    setTitle('')
+    setDescription('')
+    setStatus(statusValues[0])
   }
 
   return (
     <div className='todo-form w-full border border-gray-400 rounded-md'>
       <Heading mb='5'>Todo List</Heading>
-      <form onSubmit={formik.handleSubmit} className='!space-y-4'>
+      <form onSubmit={handleSubmit} className='!space-y-4'>
         <TextField.Root
           placeholder='Title'
           name='title'
-          value={formik.values.title}
-          onChange={formik.handleChange}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
         <TextArea
           placeholder='Description'
           name='description'
-          value={formik.values.description}
-          onChange={formik.handleChange}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
         />
         <Select.Root
           name='status'
-          value={formik.values.status}
-          onValueChange={(value) => formik.setFieldValue('status', value)}
+          value={status}
+          onValueChange={(value) => setStatus(value)}
         >
           <Select.Trigger />
           <Select.Content>
             <Select.Group>
               <Select.Label>Status</Select.Label>
-              {status.map((st, i) => (
+              {statusValues.map((st, i) => (
                 <Select.Item value={st} key={i}>
                   {st}
                 </Select.Item>
