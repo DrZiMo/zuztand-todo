@@ -1,6 +1,8 @@
 import { Badge, Button, Flex, Heading } from '@radix-ui/themes'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useTodos } from '../store/todosStore'
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
 
 const TodosList = () => {
   // const todos = [
@@ -19,8 +21,41 @@ const TodosList = () => {
   // ]
 
   const todos = useTodos((state) => state.todos)
+  const addTodo = useTodos((state) => state.addTodo)
   const removeTodo = useTodos((state) => state.removeTodo)
-  return (
+
+  const getTodos = async () => {
+    const res = await axios.get('https://jsonplaceholder.typicode.com/todos')
+    const data = res.data
+
+    // console.log({ data })
+    return data
+  }
+
+  const { isPending, data: todo } = useQuery({
+    queryKey: ['todos'],
+    queryFn: getTodos,
+  })
+
+  useEffect(() => {
+    if (todo) {
+      const slicedTodos = todo.slice(10, 20)
+      const statusOptions = ['PENDING', 'DONE', 'DENIED']
+      slicedTodos.forEach((td) => {
+        const randomNumber = Math.floor(Math.random() * statusOptions.length)
+        addTodo({
+          id: td.id,
+          title: td.title,
+          description: 'No description provided',
+          status: statusOptions[randomNumber],
+        })
+      })
+    }
+  }, [todo, addTodo])
+
+  return isPending ? (
+    <p className='text-center italic text-gray-500'>Loading ...</p>
+  ) : (
     <ul className='!mt-5 !space-y-3'>
       {todos.length ? (
         todos.map((todo, i) => (
